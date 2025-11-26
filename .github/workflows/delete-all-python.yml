@@ -1,0 +1,33 @@
+name: Delete ALL Python Files
+
+on:
+  workflow_dispatch:     # Runs ONLY when you click "Run workflow"
+
+permissions:
+  contents: write
+
+jobs:
+  delete_python_files:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure Git identity
+        run: |
+          git config --global user.name "kulkarnishub377"
+          git config --global user.email "kulkarnishub377@gmail.com"
+
+      - name: Delete ALL .py files
+        run: |
+          find . -name "*.py" -type f -delete
+          echo "All Python files deleted."
+
+      - name: Commit changes
+        run: |
+          git add -A
+          git commit -m "Deleted all Python files" || echo "No changes to commit"
+
+      - name: Push changes
+        run: git push
