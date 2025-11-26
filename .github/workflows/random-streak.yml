@@ -1,8 +1,8 @@
-name: Human-Like Daily AI/ML 
+name: Human-Like Daily AI/ML Commits (Topic Only Files)
 
 on:
   schedule:
-    - cron: "30 5 * * *"   # Runs once daily at 02:30 UTC (~8:00 AM IST)
+    - cron: "30 5 * * *"   # Runs once daily at ~10 AM IST
   workflow_dispatch:
 
 permissions:
@@ -21,87 +21,104 @@ jobs:
           git config --global user.name "kulkarnishub377"
           git config --global user.email "kulkarnishub377@gmail.com"
 
-      - name: Cleanup yesterday's generated files
+      - name: Cleanup previously generated topic files
         run: |
-          rm -f ai_*.py ml_*.py cv_*.py cnn_*.py || true
+          rm -f feature_extractor.py \
+                image_preprocessor.py \
+                cnn_block.py \
+                ml_trainer.py \
+                model_utils.py \
+                tensor_ops.py \
+                vision_encoder.py \
+                ai_helper.py \
+                regression_pipeline.py \
+                classification_module.py \
+                cv_detector.py || true
 
-      - name: Generate human-like daily commit count (12–24)
+      - name: Generate commit count (12–24)
         id: num
         run: |
           COUNT=$((12 + RANDOM % 13))
           echo "count=$COUNT" >> $GITHUB_OUTPUT
-          echo "Generating $COUNT commits today."
+          echo "Will generate $COUNT commits today."
 
-      - name: Perform 12–24 human-like commits
+      - name: Perform human-like commits
         run: |
           MESSAGES=(
-            "Refactor: improved model structure"
-            "Enhancement: updated ML pipeline flow"
-            "Fix: minor cleanup in AI utils"
-            "Update: improved feature extraction code"
-            "Refactor: simplified training loop"
-            "Docs: updated comments"
-            "Experiment: testing model variations"
-            "Optimize: slight performance improvement"
+            "Refactor: improved structure"
+            "Enhancement: updated training logic"
+            "Fix: small cleanup"
+            "Experiment: new ML approach"
+            "Improve: optimized model latency"
+            "Docs: updated inline docs"
+            "Tune: hyperparameters updated"
             "Cleanup: removed unused imports"
-            "Research: added experiment notes"
-            "Tune: updated hyperparameters"
-            "Improve: revised CNN block"
-            "Experiment: added preprocessing step"
+            "Research: experiment tracking"
+            "Polish: refined preprocessing pipeline"
+            "Model: architecture improvement"
+          )
+
+          TOPICS=(
+            "feature_extractor"
+            "image_preprocessor"
+            "cnn_block"
+            "ml_trainer"
+            "model_utils"
+            "tensor_ops"
+            "vision_encoder"
+            "ai_helper"
+            "regression_pipeline"
+            "classification_module"
+            "cv_detector"
           )
 
           for i in $(seq 1 ${{ steps.num.outputs.count }})
           do
-            IST_TIME=$(TZ='Asia/Kolkata' date +"%Y-%m-%d_%H-%M-%S")
-            UUID=$(cat /proc/sys/kernel/random/uuid)
+            TOPIC_INDEX=$(( RANDOM % ${#TOPICS[@]} ))
+            TOPIC="${TOPICS[$TOPIC_INDEX]}"
+            FILE="${TOPIC}.py"
+
             TYPE=$((RANDOM % 4))
 
             if [ $TYPE -eq 0 ]; then
-              FILE="ai_${IST_TIME}_${UUID}.py"
-              echo "# AI Utility Class" >> $FILE
-              echo "class AIHelper${RANDOM}:" >> $FILE
-              echo "    def process(self, x):" >> $FILE
-              echo "        return x * 2" >> $FILE
+              echo "# AI Helper Class" > $FILE
+              echo "class AIHelper:" >> $FILE
+              echo "    def normalize(self, x): return x / 255.0" >> $FILE
             fi
 
             if [ $TYPE -eq 1 ]; then
-              FILE="ml_${IST_TIME}_${UUID}.py"
-              echo "# ML Pipeline" >> $FILE
-              echo "from sklearn.linear_model import LogisticRegression" >> $FILE
+              echo "# ML Pipeline" > $FILE
+              echo "from sklearn.tree import DecisionTreeClassifier" >> $FILE
               echo "from sklearn.datasets import load_iris" >> $FILE
               echo "X, y = load_iris(return_X_y=True)" >> $FILE
-              echo "model = LogisticRegression().fit(X, y)" >> $FILE
+              echo "model = DecisionTreeClassifier().fit(X, y)" >> $FILE
             fi
 
             if [ $TYPE -eq 2 ]; then
-              FILE="cv_${IST_TIME}_${UUID}.py"
-              echo "# OpenCV Script" >> $FILE
+              echo "# OpenCV Processing" > $FILE
               echo "import cv2, numpy as np" >> $FILE
-              echo "img = np.random.randint(0,255,(200,200,3),dtype=np.uint8)" >> $FILE
-              echo "edges = cv2.Canny(img, 100, 200)" >> $FILE
+              echo "img = np.random.randint(0,255,(128,128,3),dtype=np.uint8)" >> $FILE
+              echo "edges = cv2.Canny(img,100,200)" >> $FILE
             fi
 
             if [ $TYPE -eq 3 ]; then
-              FILE="cnn_${IST_TIME}_${UUID}.py"
-              echo "# CNN Model" >> $FILE
+              echo "# CNN Block" > $FILE
               echo "import torch.nn as nn" >> $FILE
-              echo "class MiniCNN${RANDOM}(nn.Module):" >> $FILE
+              echo "class Block(nn.Module):" >> $FILE
               echo "    def __init__(self):" >> $FILE
               echo "        super().__init__()" >> $FILE
-              echo "        self.conv = nn.Conv2d(3, 16, 3, padding=1)" >> $FILE
-              echo "        self.fc = nn.Linear(16*32*32, 10)" >> $FILE
+              echo "        self.conv = nn.Conv2d(3,32,3,padding=1)" >> $FILE
+              echo "    def forward(self,x): return self.conv(x)" >> $FILE
             fi
 
-            # choose random commit message
             MSG_INDEX=$(( RANDOM % ${#MESSAGES[@]} ))
             COMMIT_MSG="${MESSAGES[$MSG_INDEX]}"
 
             git add .
             git commit -m "$COMMIT_MSG (#$i)"
 
-            # Add a natural human delay between commits (2–5 seconds)
-            sleep $((2 + RANDOM % 4))
+            sleep $((2 + RANDOM % 4))  # human-like delay
           done
 
-      - name: Push final result
+      - name: Push changes
         run: git push
