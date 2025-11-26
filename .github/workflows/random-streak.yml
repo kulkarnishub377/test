@@ -1,142 +1,107 @@
-name: Pro AI/ML Developer Random Commits (10–100/day)
+name: Human-Like Daily AI/ML 
 
 on:
   schedule:
-    - cron: "*/10 * * * *"   # Random opportunity every 10 minutes
+    - cron: "30 5 * * *"   # Runs once daily at 02:30 UTC (~8:00 AM IST)
   workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  ai-pro-streak:
+  daily_ai_commits:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Decide randomly whether to commit
-        id: rnd
+      - name: Configure Git identity
         run: |
-          RAND=$((1 + RANDOM % 100))
-          echo "Random number: $RAND"
+          git config --global user.name "kulkarnishub377"
+          git config --global user.email "kulkarnishub377@gmail.com"
 
-          # ~10–100 commits/day
-          if [ $RAND -le 70 ]; then
-            echo "commit=true" >> $GITHUB_OUTPUT
-          else
-            echo "commit=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Stop if commit not chosen
-        if: steps.rnd.outputs.commit == 'false'
-        run: echo "Skipping this run..."
-
-      - name: Cleanup previously generated files
-        if: steps.rnd.outputs.commit == 'true'
+      - name: Cleanup yesterday's generated files
         run: |
-          rm -f ai_*.py ml_*.py cv_*.py dl_*.py cnn_*.py || true
+          rm -f ai_*.py ml_*.py cv_*.py cnn_*.py || true
 
-      - name: Generate Random AI/ML/CV Python Code
-        if: steps.rnd.outputs.commit == 'true'
+      - name: Generate human-like daily commit count (12–24)
+        id: num
         run: |
-          IST_TIME=$(TZ='Asia/Kolkata' date +"%Y-%m-%d_%H-%M-%S")
+          COUNT=$((12 + RANDOM % 13))
+          echo "count=$COUNT" >> $GITHUB_OUTPUT
+          echo "Generating $COUNT commits today."
 
-          # 1–5 files per commit (human-like behavior)
-          FILE_COUNT=$((1 + RANDOM % 5))
+      - name: Perform 12–24 human-like commits
+        run: |
+          MESSAGES=(
+            "Refactor: improved model structure"
+            "Enhancement: updated ML pipeline flow"
+            "Fix: minor cleanup in AI utils"
+            "Update: improved feature extraction code"
+            "Refactor: simplified training loop"
+            "Docs: updated comments"
+            "Experiment: testing model variations"
+            "Optimize: slight performance improvement"
+            "Cleanup: removed unused imports"
+            "Research: added experiment notes"
+            "Tune: updated hyperparameters"
+            "Improve: revised CNN block"
+            "Experiment: added preprocessing step"
+          )
 
-          echo "Generating $FILE_COUNT AI/ML/CV files..."
-
-          for i in $(seq 1 $FILE_COUNT); do
+          for i in $(seq 1 ${{ steps.num.outputs.count }})
+          do
+            IST_TIME=$(TZ='Asia/Kolkata' date +"%Y-%m-%d_%H-%M-%S")
             UUID=$(cat /proc/sys/kernel/random/uuid)
-            TYPE=$((RANDOM % 5))
+            TYPE=$((RANDOM % 4))
 
             if [ $TYPE -eq 0 ]; then
-              FILENAME="ai_class_${IST_TIME}_${UUID}.py"
-              echo "# Random AI Utility Class" >> $FILENAME
-              echo "class AIHelper${RANDOM}:" >> $FILENAME
-              echo "    def __init__(self):" >> $FILENAME
-              echo "        self.value = ${RANDOM}" >> $FILENAME
-              echo "    def compute(self, x):" >> $FILENAME
-              echo "        return x * 2 + self.value" >> $FILENAME
-              echo "print(AIHelper${RANDOM}().compute(10))" >> $FILENAME
+              FILE="ai_${IST_TIME}_${UUID}.py"
+              echo "# AI Utility Class" >> $FILE
+              echo "class AIHelper${RANDOM}:" >> $FILE
+              echo "    def process(self, x):" >> $FILE
+              echo "        return x * 2" >> $FILE
             fi
 
             if [ $TYPE -eq 1 ]; then
-              FILENAME="deep_layers_${IST_TIME}_${UUID}.py"
-              echo "# Deep-Learning Layers (Random)" >> $FILENAME
-              echo "import torch" >> $FILENAME
-              echo "import torch.nn as nn" >> $FILENAME
-              echo "class DeepNet${RANDOM}(nn.Module):" >> $FILENAME
-              echo "    def __init__(self):" >> $FILENAME
-              echo "        super().__init__()" >> $FILENAME
-              echo "        self.fc1 = nn.Linear(128, 256)" >> $FILENAME
-              echo "        self.act1 = nn.ReLU()" >> $FILENAME
-              echo "        self.fc2 = nn.Linear(256, 64)" >> $FILENAME
-              echo "        self.act2 = nn.Sigmoid()" >> $FILENAME
-              echo "    def forward(self, x):" >> $FILENAME
-              echo "        x = self.act1(self.fc1(x))" >> $FILENAME
-              echo "        x = self.act2(self.fc2(x))" >> $FILENAME
-              echo "        return x" >> $FILENAME
-              echo "print(DeepNet${RANDOM}()(torch.randn(1,128)))" >> $FILENAME
+              FILE="ml_${IST_TIME}_${UUID}.py"
+              echo "# ML Pipeline" >> $FILE
+              echo "from sklearn.linear_model import LogisticRegression" >> $FILE
+              echo "from sklearn.datasets import load_iris" >> $FILE
+              echo "X, y = load_iris(return_X_y=True)" >> $FILE
+              echo "model = LogisticRegression().fit(X, y)" >> $FILE
             fi
 
             if [ $TYPE -eq 2 ]; then
-              FILENAME="cnn_model_${IST_TIME}_${UUID}.py"
-              echo "# Random CNN Architecture" >> $FILENAME
-              echo "import torch" >> $FILENAME
-              echo "import torch.nn as nn" >> $FILENAME
-              echo "class RandomCNN${RANDOM}(nn.Module):" >> $FILENAME
-              echo "    def __init__(self):" >> $FILENAME
-              echo "        super().__init__()" >> $FILENAME
-              echo "        self.conv1 = nn.Conv2d(3, 16, 3, padding=1)" >> $FILENAME
-              echo "        self.conv2 = nn.Conv2d(16, 32, 3, padding=1)" >> $FILENAME
-              echo "        self.pool = nn.MaxPool2d(2)" >> $FILENAME
-              echo "        self.fc = nn.Linear(32*8*8, 10)" >> $FILENAME
-              echo "    def forward(self, x):" >> $FILENAME
-              echo "        x = self.pool(torch.relu(self.conv1(x)))" >> $FILENAME
-              echo "        x = self.pool(torch.relu(self.conv2(x)))" >> $FILENAME
-              echo "        x = x.view(x.size(0), -1)" >> $FILENAME
-              echo "        return self.fc(x)" >> $FILENAME
-              echo "print(RandomCNN${RANDOM}()(torch.randn(1,3,32,32)))" >> $FILENAME
+              FILE="cv_${IST_TIME}_${UUID}.py"
+              echo "# OpenCV Script" >> $FILE
+              echo "import cv2, numpy as np" >> $FILE
+              echo "img = np.random.randint(0,255,(200,200,3),dtype=np.uint8)" >> $FILE
+              echo "edges = cv2.Canny(img, 100, 200)" >> $FILE
             fi
 
             if [ $TYPE -eq 3 ]; then
-              FILENAME="opencv_process_${IST_TIME}_${UUID}.py"
-              echo "# Random OpenCV File" >> $FILENAME
-              echo "import cv2" >> $FILENAME
-              echo "import numpy as np" >> $FILENAME
-              echo "img = np.random.randint(0, 255, (200,200,3), dtype=np.uint8)" >> $FILENAME
-              echo "blur = cv2.GaussianBlur(img, (5,5), 0)" >> $FILENAME
-              echo "edges = cv2.Canny(blur, 50, 150)" >> $FILENAME
-              echo "print('Edges shape:', edges.shape)" >> $FILENAME
+              FILE="cnn_${IST_TIME}_${UUID}.py"
+              echo "# CNN Model" >> $FILE
+              echo "import torch.nn as nn" >> $FILE
+              echo "class MiniCNN${RANDOM}(nn.Module):" >> $FILE
+              echo "    def __init__(self):" >> $FILE
+              echo "        super().__init__()" >> $FILE
+              echo "        self.conv = nn.Conv2d(3, 16, 3, padding=1)" >> $FILE
+              echo "        self.fc = nn.Linear(16*32*32, 10)" >> $FILE
             fi
 
-            if [ $TYPE -eq 4 ]; then
-              FILENAME="ml_pipeline_${IST_TIME}_${UUID}.py"
-              echo "# Random ML Pipeline" >> $FILENAME
-              echo "from sklearn.svm import SVC" >> $FILENAME
-              echo "from sklearn.datasets import load_breast_cancer" >> $FILENAME
-              echo "X, y = load_breast_cancer(return_X_y=True)" >> $FILENAME
-              echo "model = SVC(probability=True)" >> $FILENAME
-              echo "model.fit(X, y)" >> $FILENAME
-              echo "print('Prediction:', model.predict(X[:1]))" >> $FILENAME
-            fi
+            # choose random commit message
+            MSG_INDEX=$(( RANDOM % ${#MESSAGES[@]} ))
+            COMMIT_MSG="${MESSAGES[$MSG_INDEX]}"
+
+            git add .
+            git commit -m "$COMMIT_MSG (#$i)"
+
+            # Add a natural human delay between commits (2–5 seconds)
+            sleep $((2 + RANDOM % 4))
           done
 
-      - name: Configure Git identity
-        if: steps.rnd.outputs.commit == 'true'
-        run: |
-          git config --global user.name "kulkarnishub377"
-          git config --global user.email "kulkarnishub377@gamil.com"
-
-      - name: Commit changes
-        if: steps.rnd.outputs.commit == 'true'
-        run: |
-          git add .
-          git commit -m " python test/ practices  — $(TZ='Asia/Kolkata' date)" || echo "No changes"
-
-      - name: Push
-        if: steps.rnd.outputs.commit == 'true'
+      - name: Push final result
         run: git push
