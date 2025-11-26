@@ -1,71 +1,142 @@
-name: Random Commits (10–100/day)
+name: Pro AI/ML Developer Random Commits (10–100/day)
 
 on:
   schedule:
-    # Runs every 10 minutes (144 runs/day)
-    - cron: "*/10 * * * *"
+    - cron: "*/10 * * * *"   # Random opportunity every 10 minutes
   workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  random-streak:
+  ai-pro-streak:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Decide randomly whether to commit
-        id: random_check
+        id: rnd
         run: |
-          # Generate random number 1–100
           RAND=$((1 + RANDOM % 100))
+          echo "Random number: $RAND"
 
-          echo "Random Number = $RAND"
-
-          # 70% chance to commit → ~100 random commits max per day
-          # Ensures >10 but <100 per day on average
-          if [ $RAND -le 50 ]; then
+          # ~10–100 commits/day
+          if [ $RAND -le 70 ]; then
             echo "commit=true" >> $GITHUB_OUTPUT
           else
             echo "commit=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Stop if commit not chosen this run
-        if: steps.random_check.outputs.commit == 'false'
-        run: echo "Skipping commit this run."
+      - name: Stop if commit not chosen
+        if: steps.rnd.outputs.commit == 'false'
+        run: echo "Skipping this run..."
 
-      - name: Delete old random files
-        if: steps.random_check.outputs.commit == 'true'
+      - name: Cleanup previously generated files
+        if: steps.rnd.outputs.commit == 'true'
         run: |
-          rm -f random_*.txt || true
+          rm -f ai_*.py ml_*.py cv_*.py dl_*.py cnn_*.py || true
 
-      - name: Create randomized file + content
-        if: steps.random_check.outputs.commit == 'true'
+      - name: Generate Random AI/ML/CV Python Code
+        if: steps.rnd.outputs.commit == 'true'
         run: |
           IST_TIME=$(TZ='Asia/Kolkata' date +"%Y-%m-%d_%H-%M-%S")
-          FILENAME="random_${IST_TIME}_$(cat /proc/sys/kernel/random/uuid).txt"
 
-          echo "IST Timestamp: $(TZ='Asia/Kolkata' date)" >> $FILENAME
-          echo "Random Number: $RANDOM" >> $FILENAME
-          echo "Random Bytes: $(head -c 32 /dev/urandom | base64)" >> $FILENAME
-          echo "UUID: $(cat /proc/sys/kernel/random/uuid)" >> $FILENAME
-          echo "--- END ---" >> $FILENAME
+          # 1–5 files per commit (human-like behavior)
+          FILE_COUNT=$((1 + RANDOM % 5))
+
+          echo "Generating $FILE_COUNT AI/ML/CV files..."
+
+          for i in $(seq 1 $FILE_COUNT); do
+            UUID=$(cat /proc/sys/kernel/random/uuid)
+            TYPE=$((RANDOM % 5))
+
+            if [ $TYPE -eq 0 ]; then
+              FILENAME="ai_class_${IST_TIME}_${UUID}.py"
+              echo "# Random AI Utility Class" >> $FILENAME
+              echo "class AIHelper${RANDOM}:" >> $FILENAME
+              echo "    def __init__(self):" >> $FILENAME
+              echo "        self.value = ${RANDOM}" >> $FILENAME
+              echo "    def compute(self, x):" >> $FILENAME
+              echo "        return x * 2 + self.value" >> $FILENAME
+              echo "print(AIHelper${RANDOM}().compute(10))" >> $FILENAME
+            fi
+
+            if [ $TYPE -eq 1 ]; then
+              FILENAME="deep_layers_${IST_TIME}_${UUID}.py"
+              echo "# Deep-Learning Layers (Random)" >> $FILENAME
+              echo "import torch" >> $FILENAME
+              echo "import torch.nn as nn" >> $FILENAME
+              echo "class DeepNet${RANDOM}(nn.Module):" >> $FILENAME
+              echo "    def __init__(self):" >> $FILENAME
+              echo "        super().__init__()" >> $FILENAME
+              echo "        self.fc1 = nn.Linear(128, 256)" >> $FILENAME
+              echo "        self.act1 = nn.ReLU()" >> $FILENAME
+              echo "        self.fc2 = nn.Linear(256, 64)" >> $FILENAME
+              echo "        self.act2 = nn.Sigmoid()" >> $FILENAME
+              echo "    def forward(self, x):" >> $FILENAME
+              echo "        x = self.act1(self.fc1(x))" >> $FILENAME
+              echo "        x = self.act2(self.fc2(x))" >> $FILENAME
+              echo "        return x" >> $FILENAME
+              echo "print(DeepNet${RANDOM}()(torch.randn(1,128)))" >> $FILENAME
+            fi
+
+            if [ $TYPE -eq 2 ]; then
+              FILENAME="cnn_model_${IST_TIME}_${UUID}.py"
+              echo "# Random CNN Architecture" >> $FILENAME
+              echo "import torch" >> $FILENAME
+              echo "import torch.nn as nn" >> $FILENAME
+              echo "class RandomCNN${RANDOM}(nn.Module):" >> $FILENAME
+              echo "    def __init__(self):" >> $FILENAME
+              echo "        super().__init__()" >> $FILENAME
+              echo "        self.conv1 = nn.Conv2d(3, 16, 3, padding=1)" >> $FILENAME
+              echo "        self.conv2 = nn.Conv2d(16, 32, 3, padding=1)" >> $FILENAME
+              echo "        self.pool = nn.MaxPool2d(2)" >> $FILENAME
+              echo "        self.fc = nn.Linear(32*8*8, 10)" >> $FILENAME
+              echo "    def forward(self, x):" >> $FILENAME
+              echo "        x = self.pool(torch.relu(self.conv1(x)))" >> $FILENAME
+              echo "        x = self.pool(torch.relu(self.conv2(x)))" >> $FILENAME
+              echo "        x = x.view(x.size(0), -1)" >> $FILENAME
+              echo "        return self.fc(x)" >> $FILENAME
+              echo "print(RandomCNN${RANDOM}()(torch.randn(1,3,32,32)))" >> $FILENAME
+            fi
+
+            if [ $TYPE -eq 3 ]; then
+              FILENAME="opencv_process_${IST_TIME}_${UUID}.py"
+              echo "# Random OpenCV File" >> $FILENAME
+              echo "import cv2" >> $FILENAME
+              echo "import numpy as np" >> $FILENAME
+              echo "img = np.random.randint(0, 255, (200,200,3), dtype=np.uint8)" >> $FILENAME
+              echo "blur = cv2.GaussianBlur(img, (5,5), 0)" >> $FILENAME
+              echo "edges = cv2.Canny(blur, 50, 150)" >> $FILENAME
+              echo "print('Edges shape:', edges.shape)" >> $FILENAME
+            fi
+
+            if [ $TYPE -eq 4 ]; then
+              FILENAME="ml_pipeline_${IST_TIME}_${UUID}.py"
+              echo "# Random ML Pipeline" >> $FILENAME
+              echo "from sklearn.svm import SVC" >> $FILENAME
+              echo "from sklearn.datasets import load_breast_cancer" >> $FILENAME
+              echo "X, y = load_breast_cancer(return_X_y=True)" >> $FILENAME
+              echo "model = SVC(probability=True)" >> $FILENAME
+              echo "model.fit(X, y)" >> $FILENAME
+              echo "print('Prediction:', model.predict(X[:1]))" >> $FILENAME
+            fi
+          done
 
       - name: Configure Git identity
-        if: steps.random_check.outputs.commit == 'true'
+        if: steps.rnd.outputs.commit == 'true'
         run: |
           git config --global user.name "kulkarnishub377"
           git config --global user.email "kulkarnishub377@gmil.com"
 
       - name: Commit changes
-        if: steps.random_check.outputs.commit == 'true'
+        if: steps.rnd.outputs.commit == 'true'
         run: |
           git add .
-          git commit -m "Random commit at $(TZ='Asia/Kolkata' date)" || echo "No changes"
+          git commit -m " python test/ practices  — $(TZ='Asia/Kolkata' date)" || echo "No changes"
 
       - name: Push
-        if: steps.random_check.outputs.commit == 'true'
+        if: steps.rnd.outputs.commit == 'true'
         run: git push
