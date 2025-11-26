@@ -129,7 +129,7 @@ jobs:
         if: steps.rnd.outputs.commit == 'true'
         run: |
           git config --global user.name "kulkarnishub377"
-          git config --global user.email "kulkarnishub377@gmil.com"
+          git config --global user.email "kulkarnishub377@gamil.com"
 
       - name: Commit changes
         if: steps.rnd.outputs.commit == 'true'
