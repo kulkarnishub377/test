@@ -83,3 +83,4 @@ Commit #32 | WIP: small tweaks | Wed Nov 26 10:04:34 UTC 2025
 Commit #33 | Chore: routine small update | Wed Nov 26 10:04:34 UTC 2025
 Commit #34 | Refactor: improved logic flow | Wed Nov 26 10:04:34 UTC 2025
 Commit #35 | Docs: updated change notes | Wed Nov 26 10:04:34 UTC 2025
+Commit #36 | Polish: refined formatting | Wed Nov 26 10:04:34 UTC 2025
