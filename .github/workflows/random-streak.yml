@@ -1,0 +1,71 @@
+name: Random Commits (10–100/day)
+
+on:
+  schedule:
+    # Runs every 10 minutes (144 runs/day)
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  random-streak:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Decide randomly whether to commit
+        id: random_check
+        run: |
+          # Generate random number 1–100
+          RAND=$((1 + RANDOM % 100))
+
+          echo "Random Number = $RAND"
+
+          # 70% chance to commit → ~100 random commits max per day
+          # Ensures >10 but <100 per day on average
+          if [ $RAND -le 50 ]; then
+            echo "commit=true" >> $GITHUB_OUTPUT
+          else
+            echo "commit=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Stop if commit not chosen this run
+        if: steps.random_check.outputs.commit == 'false'
+        run: echo "Skipping commit this run."
+
+      - name: Delete old random files
+        if: steps.random_check.outputs.commit == 'true'
+        run: |
+          rm -f random_*.txt || true
+
+      - name: Create randomized file + content
+        if: steps.random_check.outputs.commit == 'true'
+        run: |
+          IST_TIME=$(TZ='Asia/Kolkata' date +"%Y-%m-%d_%H-%M-%S")
+          FILENAME="random_${IST_TIME}_$(cat /proc/sys/kernel/random/uuid).txt"
+
+          echo "IST Timestamp: $(TZ='Asia/Kolkata' date)" >> $FILENAME
+          echo "Random Number: $RANDOM" >> $FILENAME
+          echo "Random Bytes: $(head -c 32 /dev/urandom | base64)" >> $FILENAME
+          echo "UUID: $(cat /proc/sys/kernel/random/uuid)" >> $FILENAME
+          echo "--- END ---" >> $FILENAME
+
+      - name: Configure Git identity
+        if: steps.random_check.outputs.commit == 'true'
+        run: |
+          git config --global user.name "kulkarnishub377"
+          git config --global user.email "kulkarnishub377@gmil.com"
+
+      - name: Commit changes
+        if: steps.random_check.outputs.commit == 'true'
+        run: |
+          git add .
+          git commit -m "Random commit at $(TZ='Asia/Kolkata' date)" || echo "No changes"
+
+      - name: Push
+        if: steps.random_check.outputs.commit == 'true'
+        run: git push
