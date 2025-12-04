@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0          # required so git detects changes
+          fetch-depth: 0
           persist-credentials: true
 
       - name: Configure Git
@@ -23,21 +23,27 @@ jobs:
           git config --global user.name "kulkarnishub377"
           git config --global user.email "kulkarnishub377@gmail.com"
 
-      - name: Delete old file
-        run: rm -f daily_ai_update.py || true
+      - name: Generate timestamp
+        id: ts
+        run: echo "TIME=$(date '+%Y-%m-%d_%H-%M')" >> $GITHUB_ENV
 
-      - name: Create AI/ML update file
+      - name: Create dated AI/ML update file
         run: |
-          echo "# Daily AI/ML Update" > daily_ai_update.py
-          echo "" >> daily_ai_update.py
-          echo "import random" >> daily_ai_update.py
-          echo "import numpy as np" >> daily_ai_update.py
-          echo "" >> daily_ai_update.py
-          echo "print('--- Daily AI/ML Auto-Generated Update ---')" >> daily_ai_update.py
-          echo "print('Random AI Value:', random.random())" >> daily_ai_update.py
-          echo "print('Random Numpy Array:', np.random.rand(3))" >> daily_ai_update.py
-          echo "" >> daily_ai_update.py
-          echo "# Auto-updated by GitHub Actions" >> daily_ai_update.py
+          FILE="daily_ai_update_${TIME}.py"
+          echo "FILE_NAME=$FILE" >> $GITHUB_ENV
+
+          echo "# Daily AI/ML Update — Generated on ${TIME}" > "$FILE"
+          echo "" >> "$FILE"
+          echo "import random" >> "$FILE"
+          echo "import numpy as np" >> "$FILE"
+          echo "" >> "$FILE"
+          echo "print('--- Daily AI/ML Auto-Generated Update ---')" >> "$FILE"
+          echo "print('Generated on:', '${TIME}')" >> "$FILE"
+          echo "print('File name:', '${FILE}')" >> "$FILE"
+          echo "print('Random AI Value:', random.random())" >> "$FILE"
+          echo "print('Random Numpy Array:', np.random.rand(3))" >> "$FILE"
+          echo "" >> "$FILE"
+          echo "# Auto-updated by GitHub Actions" >> "$FILE"
 
       - name: Check git status
         run: git status
@@ -45,7 +51,7 @@ jobs:
       - name: Commit changes
         run: |
           git add -A
-          git commit -m "Daily AI/ML update (auto-generated)" || echo "No changes"
+          git commit -m "Daily AI/ML update for ${TIME}" || echo "No changes"
 
       - name: Push changes
         run: git push
