@@ -133,3 +133,4 @@ Commit #32 | Polish: refined formatting | Thu Dec  4 12:12:57 UTC 2025
 Commit #33 | Update: added small improvements | Thu Dec  4 12:12:57 UTC 2025
 Commit #34 | Maintenance: regular code update | Thu Dec  4 12:12:57 UTC 2025
 Commit #35 | Refactor: reorganized file content | Thu Dec  4 12:12:57 UTC 2025
+Commit #36 | Enhancement: cleaned up code structure | Thu Dec  4 12:12:57 UTC 2025
