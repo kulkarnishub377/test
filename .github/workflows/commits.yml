@@ -1,4 +1,4 @@
-name: Human-like 50 Commits
+name: Human-like 10 Commits
 
 on:
   workflow_dispatch:   # Only runs manually
@@ -19,7 +19,7 @@ jobs:
           git config --global user.name "kulkarnishub377"
           git config --global user.email "kulkarnishub377@gmail.com"
 
-      - name: Create 50 human-like commits
+      - name: Create 10 human-like commits
         run: |
           MESSAGES=(
             "Refactor: improved logic flow"
@@ -34,7 +34,7 @@ jobs:
             "Maintenance: regular code update"
           )
 
-          for i in {1..50}
+          for i in {1..10}
           do
             MSG_INDEX=$(( RANDOM % 10 ))
             MSG="${MESSAGES[$MSG_INDEX]}"
